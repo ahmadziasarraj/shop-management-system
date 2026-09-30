@@ -1,0 +1,77 @@
+
+--------------The five major account types---------------
+
+| Code   | Type        | Examples                   |
+| ------ | ----------- | -------------------------- |
+| `1xxx` | Assets      | Cash, Bank, Inventory      |
+| `2xxx` | Liabilities | Payables, Loans            |
+| `3xxx` | Equity      | Capital, Retained Earnings |
+| `4xxx` | Revenue     | Sales                      |
+| `5xxx` | COGS        | Cost of Goods Sold         |
+| `6xxx` | Expenses    | Rent, Salary, Electricity  |
+
+
+---------Dr&Cr--------------
+
+| Account   | Debit    | Credit   |
+| --------- | -------- | -------- |
+| Asset     | Increase | Decrease |
+| Liability | Decrease | Increase |
+| Equity    | Decrease | Increase |
+| Revenue   | Decrease | Increase |
+| Expense   | Increase | Decrease |
+
+
+
+1000 Assets----
+
+1100 Current Assets
+1110 Cash
+1120 Bank
+1130 Accounts Receivable
+1140 Inventory
+1150 Prepaid Expenses
+
+1200 Fixed Assets
+1210 Equipment
+1220 Furniture
+1230 Vehicles
+1290 Accumulated Depreciation
+
+2000 Liabilities-----
+
+2100 Current Liabilities
+2110 Accounts Payable
+2120 Tax Payable
+2130 Accrued Expenses
+
+2200 Long-Term Liabilities
+2210 Loans
+
+
+3000 Equity-------
+
+3100 Owner Capital
+3200 Retained Earnings
+3300 Current Year Profit
+
+4000 Revenue-------
+
+4100 Sales Revenue
+4200 Sales Returns
+4300 Other Revenue
+
+5000 Cost of Sales--------
+
+5100 COGS
+5200 Purchase Returns
+
+6000 Operating Expenses-------
+
+6100 Rent
+6200 Salaries
+6300 Electricity
+6400 Internet
+6500 Transportation
+6600 Maintenance
+6700 Other Expenses

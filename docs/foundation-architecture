@@ -1,0 +1,28 @@
+app/
+├── Models/
+│   ├── Company.php
+│   ├── Branch.php
+│   ├── Currency.php
+│   ├── ExchangeRate.php
+│   ├── FiscalPeriod.php
+│   ├── Account.php
+│   ├── Journal.php
+│   └── JournalEntry.php
+│
+├── Services/
+│   └── Accounting/
+│       └── AccountingService.php
+│
+├── Enums/
+│   ├── AccountType.php
+│   ├── NormalBalance.php
+│   ├── JournalStatus.php
+│   └── FiscalPeriodStatus.php
+│
+└── Filament/
+    └── Resources/
+        ├── CompanyResource/
+        ├── CurrencyResource/
+        ├── ExchangeRateResource/
+        ├── AccountResource/
+        └── FiscalPeriodResource/

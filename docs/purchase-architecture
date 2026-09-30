@@ -1,0 +1,39 @@
+                   PURCHASE
+                       │
+                       ↓
+               Purchase Invoice
+                       │
+          ┌────────────┴────────────┐
+          │                         │
+     Product Lines              Landed Cost
+          │                         │
+          │                   ┌─────┴─────┐
+          │                   │           │
+          │              Transportation Customs
+          │                   │
+          │                Party
+          │
+          └────────────┬────────────┘
+                       ↓
+               Cost Allocation
+                       ↓
+              Inventory Cost Layer
+                       ↓
+              Inventory Balance
+                       ↓
+               Weighted Average
+                       ↓
+                     SALE
+                       ↓
+                     COGS
+                       ↓
+                  Profit & Loss
+
+
+draft---> confirmed     ->landedcost    ->GRN  ->stoks
+    ----> confirm and GRN
+
+    Purchase Invoice
+
+(Approve) -> Open a Modal that ask the user to add (GRN) and Then ask to add (Landed Costs);
+After Approvement the system should do the payments and settlements

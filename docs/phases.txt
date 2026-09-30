@@ -1,0 +1,41 @@
+Phase 1 — Foundation
+    Authentication
+    Users
+    Roles/permissions
+    Currencies
+    Exchange rates
+    Categories
+    Units
+    Products
+Phase 2 — Inventory
+    Stock
+    Stock movements
+    Stock adjustments
+    Low-stock alerts
+    Out-of-stock alerts
+    Product pricing
+Phase 3 — Sales
+    Invoices
+    Sales
+    Payments
+    Customers
+    Customer credit
+    Sales returns
+Phase 4 — Purchases
+    Vendors
+    Purchases
+    Vendor payments
+    Purchase returns
+    Vendor balances
+Phase 5 — Financial
+    Expenses
+    Cash accounts
+    Customer ledger
+    Vendor ledger
+    COGS
+    Profit/Loss
+    Daily/monthly/yearly reports
+Phase 6 — Advanced
+    Dashboard charts
+    Data export
+    Backup/restore

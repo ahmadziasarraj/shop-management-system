@@ -1,0 +1,450 @@
+
+@props([
+    'subtotal' => 0,
+    'total_amount' => 0,
+    'base_paid_amount' => 0,
+    'base_subtotal' => 0,
+    'base_discount_amount' => 0,
+    'base_total_amount' => 0,
+    'discount_amount' => 0,
+    'paid_amount' => 0,
+    'currency' => null,
+    'base_currency' => null,
+])
+
+@php
+    $balance_amount = $total_amount - $paid_amount;
+    $base_balance_amount = $base_total_amount - $base_paid_amount;
+
+    $is_paid = $balance_amount <= 0;
+    $is_partially_paid = $paid_amount > 0 && $balance_amount > 0;
+
+    $payment_percentage = $total_amount > 0 ? min(100, max(0, ($paid_amount / $total_amount) * 100)) : 0;
+@endphp
+
+<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+    {{-- Header --}}
+    <div class="flex items-start justify-between border-b border-slate-200 px-6 py-5">
+
+        <div class="flex items-center gap-3">
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white">
+                <x-heroicon-o-calculator class="h-5 w-5" />
+            </div>
+
+            <div>
+                <h3 class="text-base font-semibold tracking-tight text-slate-900">
+                    Financial Summary
+                </h3>
+
+                <p class="mt-0.5 text-sm text-slate-500">
+                    Purchase invoice settlement overview
+                </p>
+            </div>
+
+        </div>
+
+        {{-- Payment Status --}}
+        <div @class([
+            'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold',
+            'bg-emerald-50 text-emerald-700' => $is_paid,
+            'bg-amber-50 text-amber-700' => !$is_paid,
+        ])>
+            <span @class([
+                'h-1.5 w-1.5 rounded-full',
+                'bg-emerald-500' => $is_paid,
+                'bg-amber-500' => !$is_paid,
+            ])></span>
+
+            {{ $is_paid ? 'Paid in Full' : ($is_partially_paid ? 'Partially Paid' : 'Unpaid') }}
+        </div>
+
+    </div>
+
+
+    <div class="p-6">
+
+        {{-- Primary Financial Summary --}}
+        <div
+            class="grid grid-cols-1 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+
+            {{-- Subtotal --}}
+            <div class="p-5">
+
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Subtotal
+                </p>
+
+                <div class="mt-2 flex items-baseline gap-1.5">
+                    <span class="font-mono text-xl font-semibold tabular-nums text-slate-900">
+                        {{ number_format($subtotal, 2) }}
+                    </span>
+
+                    @if ($currency)
+                        <span class="text-xs font-medium text-slate-400">
+                            {{ $currency }}
+                        </span>
+                    @endif
+                </div>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    Before discount
+                </p>
+
+            </div>
+
+
+            {{-- Discount --}}
+            <div class="p-5">
+
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Discount
+                </p>
+
+                <div class="mt-2 flex items-baseline gap-1.5">
+
+                    <span class="font-mono text-xl font-semibold tabular-nums text-rose-600">
+                        − {{ number_format($discount_amount, 2) }}
+                    </span>
+
+                    @if ($currency)
+                        <span class="text-xs font-medium text-slate-400">
+                            {{ $currency }}
+                        </span>
+                    @endif
+
+                </div>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    Applied invoice discount
+                </p>
+
+            </div>
+
+
+            {{-- Total --}}
+            <div class="bg-slate-50 p-5">
+
+                <div class="flex items-center justify-between">
+
+                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                        Invoice Total
+                    </p>
+
+                    <x-heroicon-o-arrow-trending-up class="h-4 w-4 text-slate-400" />
+
+                </div>
+
+                <div class="mt-2 flex items-baseline gap-1.5">
+
+                    <span class="font-mono text-xl font-bold tabular-nums text-slate-950">
+                        {{ number_format($total_amount, 2) }}
+                    </span>
+
+                    @if ($currency)
+                        <span class="text-xs font-medium text-slate-400">
+                            {{ $currency }}
+                        </span>
+                    @endif
+
+                </div>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    Net invoice amount
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {{-- Base Currency Breakdown --}}
+        <div class="mt-7">
+
+            <div class="mb-3 flex items-center justify-between">
+
+                <div>
+                    <h4 class="text-sm font-semibold text-slate-900">
+                        Accounting Breakdown
+                    </h4>
+
+                    <p class="mt-0.5 text-xs text-slate-400">
+                        Converted values used for accounting
+                    </p>
+                </div>
+
+                @if ($base_currency)
+                    <span
+                        class="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                        {{ $base_currency }}
+                    </span>
+                @endif
+
+            </div>
+
+
+            <div class="overflow-hidden rounded-xl border border-slate-200">
+
+                {{-- Base Subtotal --}}
+                <div class="flex items-center justify-between px-5 py-3.5">
+
+                    <div>
+                        <p class="text-sm font-medium text-slate-700">
+                            Base Subtotal
+                        </p>
+
+                        <p class="mt-0.5 text-xs text-slate-400">
+                            Original amount converted to base currency
+                        </p>
+                    </div>
+
+                    <span class="font-mono text-sm font-semibold tabular-nums text-slate-900">
+                        {{ number_format($base_subtotal, 2) }}
+                    </span>
+
+                </div>
+
+
+                {{-- Base Discount --}}
+                <div class="flex items-center justify-between border-t border-slate-100 px-5 py-3.5">
+
+                    <div>
+                        <p class="text-sm font-medium text-slate-700">
+                            Base Discount
+                        </p>
+
+                        <p class="mt-0.5 text-xs text-slate-400">
+                            Discount applied to invoice
+                        </p>
+                    </div>
+
+                    <span class="font-mono text-sm font-semibold tabular-nums text-rose-600">
+                        − {{ number_format($base_discount_amount, 2) }}
+                    </span>
+
+                </div>
+
+
+                {{-- Base Total --}}
+                <div class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-5 py-4">
+
+                    <div class="flex items-center gap-2">
+
+                        <span
+                            class="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
+                            <x-heroicon-o-banknotes class="h-4 w-4 text-slate-500" />
+                        </span>
+
+                        <span class="text-sm font-semibold text-slate-900">
+                            Base Invoice Total
+                        </span>
+
+                    </div>
+
+                    <span class="font-mono text-base font-bold tabular-nums text-slate-950">
+                        {{ number_format($base_total_amount, 2) }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- Settlement --}}
+        <div class="mt-7">
+
+            <div class="mb-3">
+                <h4 class="text-sm font-semibold text-slate-900">
+                    Settlement
+                </h4>
+
+                <p class="mt-0.5 text-xs text-slate-400">
+                    Payment progress and outstanding amount
+                </p>
+            </div>
+
+
+            <div class="overflow-hidden rounded-xl border border-slate-200">
+
+                {{-- Progress --}}
+                <div class="px-5 py-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+                            <p class="text-sm font-medium text-slate-700">
+                                Payment Progress
+                            </p>
+
+                            <p class="mt-0.5 text-xs text-slate-400">
+                                {{ number_format($payment_percentage, 0) }}% of invoice paid
+                            </p>
+                        </div>
+
+                        <span @class([
+                            'text-sm font-semibold',
+                            'text-emerald-600' => $is_paid,
+                            'text-amber-600' => !$is_paid,
+                        ])>
+                            {{ number_format($payment_percentage, 0) }}%
+                        </span>
+
+                    </div>
+
+
+                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+
+                        <div class="h-full rounded-full bg-emerald-500 transition-all"
+                            style="width: {{ $payment_percentage }}%"></div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- Settlement Values --}}
+                <div
+                    class="grid grid-cols-1 divide-y divide-slate-200 border-t border-slate-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+
+                    {{-- Total --}}
+                    <div class="px-5 py-4">
+
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                            Invoice Total
+                        </p>
+
+                        <p class="mt-1.5 font-mono text-sm font-semibold tabular-nums text-slate-900">
+                            {{ number_format($total_amount, 2) }}
+                        </p>
+
+                    </div>
+
+
+                    {{-- Paid --}}
+                    <div class="px-5 py-4">
+
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                            Paid
+                        </p>
+
+                        <p class="mt-1.5 font-mono text-sm font-semibold tabular-nums text-emerald-600">
+                            {{ number_format($paid_amount, 2) }}
+                        </p>
+
+                    </div>
+
+
+                    {{-- Balance --}}
+                    <div @class([
+                        'px-5 py-4',
+                        'bg-emerald-50/50' => $is_paid,
+                        'bg-amber-50/50' => !$is_paid,
+                    ])>
+
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                            Balance Due
+                        </p>
+
+                        <p @class([
+                            'mt-1.5 font-mono text-sm font-bold tabular-nums',
+                            'text-emerald-600' => $is_paid,
+                            'text-amber-600' => !$is_paid,
+                        ])>
+                            {{ number_format(max(0, $balance_amount), 2) }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- Footer --}}
+    <div class="border-t border-slate-200 bg-slate-50 px-6 py-4">
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+            <div class="flex items-center gap-2">
+
+                <span @class([
+                    'flex h-7 w-7 items-center justify-center rounded-lg',
+                    'bg-emerald-100' => $is_paid,
+                    'bg-amber-100' => !$is_paid,
+                ])>
+
+                    @if ($is_paid)
+                        <x-heroicon-o-check class="h-4 w-4 text-emerald-600" />
+                    @else
+                        <x-heroicon-o-clock class="h-4 w-4 text-amber-600" />
+                    @endif
+
+                </span>
+
+                <div>
+
+                    <p class="text-xs font-medium text-slate-500">
+                        Settlement Status
+                    </p>
+
+                    <p @class([
+                        'text-sm font-semibold',
+                        'text-emerald-700' => $is_paid,
+                        'text-amber-700' => !$is_paid,
+                    ])>
+                        {{ $is_paid ? 'Invoice fully settled' : 'Payment outstanding' }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="flex items-center gap-6">
+
+                <div class="text-right">
+
+                    <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                        Base Paid
+                    </p>
+
+                    <p class="mt-0.5 font-mono text-sm font-semibold tabular-nums text-slate-700">
+                        {{ number_format($base_paid_amount, 2) }}
+                    </p>
+
+                </div>
+
+
+                <div class="h-8 w-px bg-slate-200"></div>
+
+
+                <div class="text-right">
+
+                    <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                        Base Balance
+                    </p>
+
+                    <p @class([
+                        'mt-0.5 font-mono text-sm font-bold tabular-nums',
+                        'text-emerald-600' => $is_paid,
+                        'text-amber-600' => !$is_paid,
+                    ])>
+                        {{ number_format(max(0, $base_balance_amount), 2) }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

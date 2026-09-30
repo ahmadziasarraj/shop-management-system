@@ -1,0 +1,182 @@
+Stage 16
+
+CustomerPaymentService
+SupplierPaymentService
+PaymentAllocationService
+AdvancePaymentService
+HawalaSettlementService
+
+CustomerPaymentAction
+SupplierPaymentAction
+AdvancePaymentAction
+HawalaExchangeAction
+SettlementService
+
+For a customer statement, you might show:
+بردگی = Amount charged to customer
+رسیدگی = Amount received from customer
+
+For a supplier:
+بردگی = Amount paid/settled
+رسیدگی = Amount received/credited
+
+17. Customer statement
+
+Example:
+
+Ali — Customer
+
+Sale                Debit
+Payment             Credit
+Sales Return        Credit
+18. Supplier statement
+
+Example:
+
+Ali — Supplier
+
+Purchase            Credit
+Payment             Debit
+Purchase Return     Debit
+
+Customer Only: opening_receivable
+Vendor Only: opening_payable
+Both:
+Can have both:
+opening_receivable = 5,000
+opening_payable    = 2,000
+
+
+
+
+
+
+                    PAYMENT
+                       │
+             ┌─────────┴─────────┐
+             │                   │
+       Customer Payment     Supplier Payment
+             │                   │
+             └─────────┬─────────┘
+                       ↓
+             PaymentAllocationService
+                       │
+              ┌────────┴────────┐
+              │                 │
+          Invoice(s)          Advance
+              │                 │
+              ↓                 ↓
+        SettlementService   AdvancePaymentService
+              │
+              ↓
+       Party Ledger + GL
+
+
+                           TRANSACTIONS
+                         │
+        ┌────────────────┼────────────────┐
+        ↓                ↓                ↓
+      SALES           PURCHASE         EXPENSE
+        │                │                │
+        ↓                ↓                ↓
+       AR              AP              Cash/AP
+        │                │
+        └────────┬───────┘
+                 ↓
+          PAYMENT SERVICE
+                 │
+        ┌────────┴────────┐
+        ↓                 ↓
+   Cash Wallet       Hawala Wallet
+        │                 │
+        └────────┬────────┘
+                 ↓
+         Currency Exchange
+                 │
+        ┌────────┴─────────┐
+        ↓                  ↓
+     Actual Rate       FX Gain/Loss
+        │
+        ↓
+      GENERAL LEDGER
+
+
+
+For a purchase from a vendor, the vendor normally represents a Payable (liability) from your company's perspective.
+
+For your example:
+
+Purchase invoice = $100
+
+Payment now = $50
+
+Remaining payable to vendor = $50
+
+The accounting depends on whether you're recording the purchase invoice or the payment.
+
+1. Purchase invoice — $100
+When you receive the vendor invoice:
+
+Account	Debit	Credit
+Inventory / Expense	$100
+Accounts Payable — Vendor		$100
+
+So the vendor's balance is credit $100.
+
+2. Payment to vendor — $50
+When you pay $50:
+
+Account	Debit	Credit
+Accounts Payable — Vendor	$50
+Cash / Bank / Hawala		$50
+
+This reduces the vendor payable from $100 → $50.
+
+So for your payment transaction, your vendor line should be:
+
+$lines = collect([
+    new JournalLineData(
+        account: $balanceAccountResolver['vendor']['account'],
+        currency: $currency,
+        debit: $paymentAmount,
+        credit: 0,
+        exchangeRate: $rate
+    ),
+    new JournalLineData(
+        account: $paymentAccount,
+        currency: $currency,
+        debit: 0,
+        credit: $paymentAmount,
+        exchangeRate: $rate
+    ),
+]);
+
+The important part is:
+
+Vendor Payable → DEBIT $50
+Cash/Bank/Hawala → CREDIT $50
+
+
+Party type	Opening balance	Debit	Credit
+Customer	Customer owes you	AR	Opening Equity
+Customer	You owe customer	Opening Equity	AR
+Vendor	You owe vendor	Opening Equity	AP
+Vendor	Vendor owes you	AP	Opening Equity
+Hawala office	Office owes you	Hawala Receivable	Opening Equity
+Hawala office	You owe office	Opening Equity	Hawala Payable
+
+Customer
+    1130 Accounts Receivable
+    Dr = customer owes us
+    Cr = we owe customer
+
+Vendor
+    2110 Accounts Payable
+    Cr = we owe vendor
+    Dr = vendor owes us
+
+Hawala Office
+    1120 Hawala Office
+    Dr = hawala owes us
+    Cr = we owe hawala
+

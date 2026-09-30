@@ -1,0 +1,30 @@
+app/
+├── Actions/
+│   └── Accounting/
+│       ├── CreateJournalAction.php
+│       ├── PostJournalAction.php
+│       ├── ReverseJournalAction.php
+│       ├── DeleteDraftJournalAction.php ---> I am here.
+│       ├── CreateOpeningBalanceAction.php
+│       ├── CloseFiscalPeriodAction.php
+│       ├── ReopenFiscalPeriodAction.php
+│       ├── TransferBetweenAccountsAction.php
+│       ├── ConfigureSystemAccountsAction.php
+│       └── CreateDefaultChartOfAccountsAction.php
+│
+├── Data/
+│   └── Accounting/
+│       ├── JournalData.php
+│       └── JournalLineData.php
+│
+├── Services/
+│   └── Accounting/
+│       ├── AccountingService.php
+│       ├── AccountBalanceService.php
+│       └── ExchangeRateService.php
+│
+└── Exceptions/
+    └── Accounting/
+        ├── FiscalPeriodClosedException.php
+        ├── InvalidJournalException.php
+        └── JournalNotBalancedException.php

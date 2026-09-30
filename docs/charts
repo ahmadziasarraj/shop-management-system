@@ -1,0 +1,64 @@
+                    SHOP ERP
+                       │
+       ┌───────────────┼────────────────┐
+       │               │                │
+   INVENTORY          SALES          PURCHASING
+       │               │                │
+       │               │                │
+   Products         Customers         Vendors
+   Categories       Invoices          Purchase Orders
+   Warehouses       Payments          Purchases
+   Stock            Returns           Vendor Payments
+   Adjustments      Credit Sales      Returns
+       │               │                │
+       └───────────────┼────────────────┘
+                       │
+                 ACCOUNTING
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+   General Ledger   AR / Customers   AP / Vendors
+        │              │              │
+        ├──────────────┼──────────────┤
+        │              │              │
+      Cash           Bank          Expenses
+        │              │              │
+        └──────────────┼──────────────┘
+                       │
+                 FINANCIAL REPORTS
+                       │
+        ┌──────────────┼──────────────┐
+        ↓              ↓              ↓
+    Profit/Loss    Balance Sheet   Cash Flow
+
+
+============ Accounting flow Actions =============
+
+
+                    ┌──────────────┐
+                    │ Filament UI  │
+                    └──────┬───────┘
+                           │
+                           ↓
+                    ┌──────────────┐
+                    │    Action    │
+                    └──────┬───────┘
+                           │
+                           ↓
+                 ┌────────────────────┐
+                 │ AccountingService  │
+                 └─────────┬──────────┘
+                           │
+             ┌─────────────┼──────────────┐
+             ↓             ↓              ↓
+          Journal       Accounts       Currency
+             │
+             ↓
+       Journal Entries
+             │
+             ↓
+        General Ledger
+             │
+       ┌─────┴─────┐
+       ↓           ↓
+    Balance      Reports

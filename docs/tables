@@ -1,0 +1,115 @@
+users
+roles
+permissions
+
+currencies
+exchange_rates
+
+products
+product_categories
+product_units
+product_prices
+
+customers
+customer_transactions
+
+vendors
+vendor_transactions
+
+purchases
+purchase_items
+purchase_returns
+purchase_return_items
+
+sales
+sale_items
+sales_returns
+sales_return_items
+
+stock_movements
+stock_adjustments
+
+payments
+payment_methods
+cash_accounts
+
+expenses
+expense_categories
+
+-------------DB STRUCTURE--------------------
+
+IDENTITY
+├── users
+├── roles
+└── permissions
+
+PRODUCT
+├── products
+├── variants
+├── units
+├── product_prices
+
+INVENTORY
+├── warehouses
+├── warehouse_stocks
+├── stock_movements
+├── stock_transfers
+└── stock_adjustments
+
+SALES
+├── quotations
+├── sales_orders
+├── sales_invoices
+├── sales_invoice_items
+├── sales_returns
+└── sales_return_items
+
+PURCHASING
+├── purchase_requests
+├── purchase_orders
+├── goods_receipts
+├── purchases
+├── purchase_items
+├── purchase_returns
+└── purchase_return_items
+
+PARTIES
+├── customers
+├── customer_addresses
+├── customer_transactions
+├── vendors
+├── vendor_addresses
+└── vendor_transactions
+
+ACCOUNTING
+├── accounts
+├── journals
+├── journal_entries
+├── fiscal_periods
+├── accounting_periods
+└── account_balances
+
+MONEY
+├── currencies
+├── exchange_rates
+├── cash_accounts
+├── bank_accounts
+├── payments
+└── payment_allocations
+
+EXPENSES
+├── expense_categories
+├── expenses
+└── expense_items
+
+ASSETS
+├── fixed_assets
+├── asset_categories
+├── depreciation_entries
+└── asset_disposals
+
+SYSTEM
+├── audit_logs
+├── attachments
+├── settings
+└── notifications

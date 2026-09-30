@@ -1,0 +1,26 @@
+app/
+├── Actions/
+│
+│   ├── Sales/
+│   │   ├── CreateSale.php
+│   │   ├── PostSale.php
+│   │   ├── CancelSale.php
+│   │   └── ReturnSale.php
+│   │
+│   ├── Purchases/
+│   │   ├── CreatePurchase.php
+│   │   ├── ReceivePurchase.php
+│   │   ├── PostPurchase.php
+│   │   └── ReturnPurchase.php
+│   │
+│   ├── Inventory/
+│   │   ├── AdjustStock.php
+│   │   └── TransferStock.php
+│   │
+│   ├── Payments/
+│   │   ├── ReceiveCustomerPayment.php
+│   │   └── PayVendor.php
+│   │
+│   └── Accounting/
+│       ├── PostJournal.php
+│       └── ReverseJournal.php

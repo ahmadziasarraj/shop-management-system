@@ -1,0 +1,17 @@
+================= Product Cost of Gods Method===========
+    Specific Identification
+
+    inventory_items
+
+with something like:
+
+id
+product_variant_id
+purchase_invoice_line_id
+warehouse_id
+serial_number
+batch_number
+unit_cost
+currency_id
+status
+

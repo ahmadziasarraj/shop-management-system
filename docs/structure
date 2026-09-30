@@ -1,0 +1,32 @@
+app/
+├── Actions/
+│   └── Accounting/
+│       ├── CreateJournalAction.php
+│       ├── PostJournalAction.php
+│       ├── ReverseJournalAction.php
+│       ├── CreateOpeningBalanceAction.php
+│       └── CloseFiscalPeriodAction.php
+│
+├── Services/
+│   └── Accounting/
+│       ├── AccountingService.php
+│       ├── AccountBalanceService.php
+│       └── ExchangeRateService.php
+│
+├── Data/
+│   └── Accounting/
+│       ├── JournalData.php
+│       └── JournalLineData.php
+│
+├── Exceptions/
+│   └── Accounting/
+│       ├── JournalNotBalancedException.php
+│       ├── FiscalPeriodClosedException.php
+│       ├── InvalidJournalException.php
+│       └── InvalidAccountException.php
+│
+└── Enums/
+    ├── AccountType.php
+    ├── NormalBalance.php
+    ├── JournalStatus.php
+    └── FiscalPeriodStatus.php
