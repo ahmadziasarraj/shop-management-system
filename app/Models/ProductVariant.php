@@ -29,6 +29,16 @@ class ProductVariant extends Model
         return $this->hasMany(StockItem::class)->where('quantity_on_hand', '>', 0);
     }
 
+    public function getSelectLabelAttribute(): string
+    {
+        return sprintf(
+            '%s — %s',
+            $this->product?->name ?? 'Unknown Product',
+            $this->name,
+        );
+    }
+
+
 
     public function product(): BelongsTo
     {

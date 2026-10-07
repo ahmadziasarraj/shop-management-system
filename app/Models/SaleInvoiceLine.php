@@ -22,7 +22,7 @@ class SaleInvoiceLine extends Model
             'base_line_total' => 'decimal:10',
             'cogs_total' => 'decimal:10',
             'units_costs' => 'array',
-        ];
+        ]; 
     }
 
     public function invoice() : BelongsTo

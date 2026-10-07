@@ -69,7 +69,7 @@ class PartyLedgers extends Component implements HasTable, HasSchemas, HasActions
         $this->totalBaseDebit = (float) $query->sum('base_debit_amount');
         $this->totalBaseCredit = (float) $query->sum('base_credit_amount');
 
-        $this->balance = $this->totalBaseCredit - $this->totalBaseDebit;
+        $this->balance = $this->totalCredit - $this->totalDebit;
         $this->baseBalance = $this->totalBaseCredit - $this->totalBaseDebit;
 
         $this->status = match (true) {

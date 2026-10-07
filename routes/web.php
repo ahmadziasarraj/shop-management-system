@@ -5,6 +5,7 @@ use App\Actions\Accounting\CreateDefaultChartOfAccountsAction;
 use App\Actions\Resources\UnitMeasurementActions;
 use App\Enums\SystemAccount;
 use App\Models\Account;
+use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,4 +49,12 @@ Route::get('/add-sys-ccounts', function () {
 
 Route::get('/add-units', function (UnitMeasurementActions $action) {
     $action->insertDefaultUnits();
+});
+
+Route::get('/add-currencies', function () {
+    Currency::create([
+        'code' => 'USD',
+        'name' => 'Dollar',
+        'is_base' => true
+    ]);
 });

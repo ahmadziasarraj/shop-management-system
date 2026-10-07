@@ -6,7 +6,7 @@ use App\Enums\PaymentMethod;
 
 readonly class PurchaseInvoiceData
 {
-    public function __construct(
+    public function __construct( 
         public string $party_id,
         public string $currency_id,
         public string $currency_code,
