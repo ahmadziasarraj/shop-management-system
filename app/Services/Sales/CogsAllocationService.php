@@ -14,8 +14,7 @@ final class CogsAllocationService
 {
     public function __construct(
         private readonly ExchangeRateService $exchangeRateService,
-    ) {
-    }
+    ) {}
 
     public function emptyCogsSummary(
         string $variantId = '',
@@ -56,7 +55,7 @@ final class CogsAllocationService
             ->with('productVariant.unitMeasurement')
             ->whereIn('id', $stockIds)
             ->get()
-            ->sortBy(fn (StockItem $stock) => $order[$stock->id]);
+            ->sortBy(fn(StockItem $stock) => $order[$stock->id]);
     }
 
 
@@ -65,61 +64,41 @@ final class CogsAllocationService
         Set $set,
         ?string $method = null,
     ): void {
-        $newSoldProducts = collect($get('sold_products'))->mapWithKey(function ($soldProduct, $key) {
-            if (!$soldProduct['product_variant_id']) {
-                return [$key => [
-                                    ...$soldProduct,
-                                    'cogs_justification' => $this->emptyCogsSummary()
-                                ]
-                            ];
+        $currencyCode = $get('currency_code') ?? 'USD';
+
+        $newSoldProducts = collect($get('sold_products') ?? [])->map(function (array $soldProduct) use ($get, $method, $currencyCode) {
+            $variantId = $soldProduct['product_variant_id'] ?? null;
+
+            if (!$variantId) {
+                $soldProduct['cogs_justification'] = $this->emptyCogsSummary();
+
+                return $soldProduct;
             }
 
+            $quantity = (float) ($soldProduct['quantity'] ?? 0);
+            $unitPrice = (float) ($soldProduct['unit_price'] ?? 0);
+
+            $cogsMethod = $method
+                ?? $soldProduct['cogs_justification']['method']
+                ?? 'system';
+
+            $stockItemIds = $cogsMethod === 'manual'
+                ? ($soldProduct['cogs_justification']['stock_items_id'] ?? [])
+                : [];
+
+            $soldProduct['cogs_justification'] = $this->calculate(
+                selectedStockIds: $stockItemIds,
+                variantId: $variantId,
+                quantityRequired: $quantity,
+                unitPrice: $unitPrice,
+                currencyCode: $currencyCode,
+                method: $cogsMethod,
+            );
+
+            return $soldProduct;
         });
 
-        foreach($get('sold_products') as $key => $soldProduct) {
-            if (!$soldProduct['product_variant_id']) {
-                $productLine = [
-                    $key => [
-                        ...$soldProduct,
-                        'cogs_justification' => $this->emptyCogsSummary()
-                    ]
-                ];
-                array_push($newSoldProducts, $productLine);
-                continue;
-            }
-        }
-
-        dd($get('sold_products'), 'new', $newSoldProducts);
-        $variantId = $get('product_variant_id');
-
-        if (!$variantId) {
-            $set('cogs_justification', $this->emptyCogsSummary(
-                variantId: '',
-                quantityRequired: (float) ($get('quantity') ?? 0),
-                method: $method ?? 'system',
-            ));
-
-            return;
-        }
-
-        $quantity = (float) ($get('quantity') ?? 0);
-        $unitPrice = (float) ($get('unit_price') ?? 0);
-        $currencyCode = $get('../../currency_code') ?? 'USD';
-        $method ??= $get('cogs_justification.method') ?? 'system';
-
-        $result = $this->calculate(
-            selectedStockIds: $method === 'manual'
-            ? ($get('cogs_justification.stock_items_id') ?? [])
-            : [],
-            variantId: $variantId,
-            quantityRequired: $quantity,
-            unitPrice: $unitPrice,
-            currencyCode: $currencyCode,
-            method: $method,
-        );
-        dd($result);
-
-        $set('cogs_justification', $result);
+        $set('sold_products', $newSoldProducts->toArray());
     }
 
     public function updateCogsAllocations(
@@ -146,8 +125,8 @@ final class CogsAllocationService
             'cogs_allocations',
             $this->calculate(
                 selectedStockIds: $method === 'manual'
-                ? ($get('stock_items') ?? [])
-                : [],
+                    ? ($get('stock_items') ?? [])
+                    : [],
                 variantId: $variantId,
                 quantityRequired: $quantity,
                 unitPrice: $unitPrice,

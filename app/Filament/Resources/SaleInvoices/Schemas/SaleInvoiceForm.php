@@ -10,6 +10,7 @@ use App\Models\ProductVariant;
 use App\Models\StockItem;
 use App\Services\Accounting\ExchangeRateService;
 use App\Services\Sales\CogsAllocationService;
+use App\Services\Sales\SaleInvoiceFinancialSummary;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -48,6 +49,29 @@ class SaleInvoiceForm
                     ->schema([
                         ...self::soldProductsRepeaterFormField()
                     ])->columnSpanFull(),
+                TextEntry::make('summary')
+                    ->columnSpanFull()
+                    ->state(function (Get $get): View {
+
+                        $summary = app(SaleInvoiceFinancialSummary::class)->calculate(
+                            products: collect($get('sold_products')) ?? collect(),
+                            discountAmount: (float) ($get('discount_amount') ?? 0),
+                            paidAmount: (float) ($get('paid_amount') ?? 0),
+                            currencyCode: $get('currency_code'),
+                        );
+                        return view(
+                            'livewire.purchase-invoice-financial-summary',
+                            [
+                                'amounts' => $summary->get('amounts'),
+                                'baseAmounts' => $summary->get('baseAmounts'),
+                                'currencyCode' => $summary->get('currencyCode'),
+                                'baseCurrencyCode' => $summary->get('baseCurrencyCode'),
+                                'rate' => number_format($summary->get('rate'), 2),
+                                'paymentStatus' => $summary->get('paymentStatus'),
+                            ],
+                        );
+                    })
+                    ->html()->hiddenLabel()
             ]);
     }
 
@@ -162,7 +186,7 @@ class SaleInvoiceForm
                                         ->orWhereHas(
                                             'product',
                                             fn(Builder $query) =>
-                                                $query->where('name', 'like', "%{$search}%")
+                                            $query->where('name', 'like', "%{$search}%")
                                         );
                                 })
                                 ->orderBy('name')
@@ -441,7 +465,7 @@ class SaleInvoiceForm
                                     ->state(function (Get $get) use ($variantId, $quantity, $unitPrice, $currencyCode): View {
                                         $selectedStockIds = $get('stock_items') ?? [];
                                         // dd($selectedAllocations);
-                        
+
                                         $allocatedItems = app(CogsAllocationService::class)->calculate(
                                             selectedStockIds: $selectedStockIds,
                                             variantId: $variantId,

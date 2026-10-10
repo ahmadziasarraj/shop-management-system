@@ -5,6 +5,7 @@ namespace App\Services\Payments;
 use App\Models\LandedCost;
 use App\Models\Payment;
 use App\Models\PurchaseInvoice;
+use App\Models\SaleInvoice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -78,6 +79,43 @@ class PaymentService
                 'amount' => $landedCost->amount,
                 'base_amount' => $landedCost->base_amount,
                 'exchange_rate' => $landedCost->exchange_rate,
+
+                'payment_date' => now(),
+                'notes' => $notes,
+            ]);
+            return $payment;
+        });
+    }
+
+    public function saleInvoicePayment(SaleInvoice $invoice): Payment
+    {
+        return DB::transaction(function () use (
+            $invoice,
+        ) {
+            $notes = sprintf(
+                'Payment made to %s against sale invoice #%s.',
+                $invoice->party->name,
+                $invoice->system_invoice_number
+            );
+
+            if ($invoice->hawalaOffice) {
+                $notes .= sprintf(
+                    ' Via Hawala Office: %s.',
+                    $invoice->hawalaOffice->name
+                );
+            }
+
+            $payment = Payment::create([
+                'party_id' => $invoice->party_id,
+                'currency_id' => $invoice->currency_id,
+                'reference_type' => SaleInvoice::class,
+                'reference_id' => $invoice->id,
+
+                'payment_number' => $this->generatePaymentNumber(),
+                'payment_method' => $invoice->payment_method,
+                'amount' => $invoice->paid_amount,
+                'base_amount' => $invoice->base_paid_amount,
+                'exchange_rate' => $invoice->exchange_rate,
 
                 'payment_date' => now(),
                 'notes' => $notes,

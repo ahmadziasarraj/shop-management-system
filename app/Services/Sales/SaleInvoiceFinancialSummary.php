@@ -4,6 +4,7 @@ namespace App\Services\Sales;
 
 use App\Enums\PaymentStatus;
 use App\Models\Currency;
+use App\Models\SaleInvoiceLine;
 use App\Services\Accounting\ExchangeRateService;
 use Illuminate\Support\Collection;
 
@@ -47,6 +48,7 @@ final class SaleInvoiceFinancialSummary
             ($balance > 0 && $paidAmount > 0) => PaymentStatus::PartiallyPaid,
             $balance > 0 => PaymentStatus::Unpaid,
             $balance < 0 && $paidAmount > 0 => PaymentStatus::Paid,
+            $balance == 0 && $paidAmount > 0 => PaymentStatus::Paid,
             default => PaymentStatus::NotApplicable,
         };
 
@@ -107,7 +109,8 @@ final class SaleInvoiceFinancialSummary
          * ---------------------------------------------------------
          */
 
-        $lineAmounts = $products->map(function (array $product) use ($currencyCode, $baseCurrencyCode) {
+        $lineAmounts = $products->map(function (SaleInvoiceLine | array $product) use ($currencyCode, $baseCurrencyCode) {
+            
             $unitPrice = (float) $product['unit_price'];
             $lineTotal = (float) $product['line_total'];
 
@@ -119,7 +122,6 @@ final class SaleInvoiceFinancialSummary
                 fromCurrency: $currencyCode,
                 toCurrency: $baseCurrencyCode,
             );
-            dd($converted, $product);
 
             return [
                 'product_variant_id' => $product['product_variant_id'],
@@ -128,6 +130,7 @@ final class SaleInvoiceFinancialSummary
                 'line_total' => $lineTotal,
                 'base_unit_price' => $converted->get('unit_price'),
                 'base_line_total' => $converted->get('line_total'),
+                'cogs_total' => (float) is_array($product) ? $product['cogs_justification']['total_cogs'] : $product['cogs_total'],
             ];
         })->keyBy('product_variant_id');
 
@@ -140,6 +143,7 @@ final class SaleInvoiceFinancialSummary
             'paymentState' => $paymentState,
             'currencyCode' => $currencyCode,
             'baseCurrencyCode' => $baseCurrencyCode,
+            'net_profit_total' => $baseAmounts->get('total_amount') - $lineAmounts->sum('cogs_total'),
         ]);
     }
 }

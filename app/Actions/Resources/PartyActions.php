@@ -33,9 +33,8 @@ final class PartyActions
             $party = Party::create($data);
             $openingPayableAmount = (float) array_key_exists('opening_payable', $data) ? $data['opening_payable'] : 0;
             $openingReceivableAmount = (float) array_key_exists('opening_receivable', $data) ? $data['opening_receivable'] : 0;
-            $openingBalance = (float) array_key_exists('opening_balance', $data) ? $data['opening_balance'] : 0;
-            // dd($openingPayableAmount);
-
+            $openingBalance = (float) (array_key_exists('opening_balance', $data) ? $data['opening_balance'] : 0);
+            
             if (
                 $openingPayableAmount !== 0.0 ||
                 $openingReceivableAmount !== 0.0 ||

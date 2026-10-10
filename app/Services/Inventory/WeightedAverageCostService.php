@@ -75,7 +75,6 @@ final class WeightedAverageCostService
     }
 
     public function issue(
-        string $stockId,
         ProductVariant $product,
         float $quantity,
     ): array {
@@ -87,13 +86,11 @@ final class WeightedAverageCostService
         }
 
         return DB::transaction(function () use (
-            $stockId,
             $product,
             $quantity,
         ) {
 
             $balance = StockBalance::query()
-                ->where('stock_id', $stockId)
                 ->where('product_variant_id', $product->id)
                 ->lockForUpdate()
                 ->first();

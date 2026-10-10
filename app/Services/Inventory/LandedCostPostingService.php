@@ -24,7 +24,7 @@ final class LandedCostPostingService
         DB::transaction(function () use ($landedCost) {
 
             $landedCost->load([
-                'allocations.purchaseInvoiceLine.costLayers',
+                'allocations.purchaseInvoiceLine',
             ]);
 
             if ($landedCost->status !== LandedCostStatus::Draft) {

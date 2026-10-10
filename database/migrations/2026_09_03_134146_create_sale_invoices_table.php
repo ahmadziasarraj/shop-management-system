@@ -43,7 +43,7 @@ return new class extends Migration
             $table->decimal('base_subtotal', 20, 10);
             $table->decimal('base_discount_amount', 20, 10)->default(0);
             $table->decimal('base_total_amount', 20, 10);
-
+            $table->decimal('net_profit_total', 20, 10);
             $table->string('payment_method');
             $table->string('payment_status');
             $table->string('status');
@@ -59,7 +59,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->foreignUlid('product_variant_id')
                 ->constrained()
-                ->restrictOnDelete();
+                ->restrictOnDelete(); 
 
             $table->foreignUlid('currency_id')
                 ->constrained()
@@ -75,10 +75,9 @@ return new class extends Migration
             $table->decimal('base_unit_price', 20, 10);
             $table->decimal('base_discount_amount', 20, 10)->default(0);
             $table->decimal('base_line_total', 20, 10);
-
-            // $table->decimal('cost_unit', 20, 10);
             $table->decimal('cogs_total', 20, 10);
-            $table->json('units_costs')->nullable();
+            $table->decimal('line_net_profit_total', 20, 10);
+            $table->json('cogs_justification')->nullable();
             /**
              * units_costs = [
              *  'product_variant_id',

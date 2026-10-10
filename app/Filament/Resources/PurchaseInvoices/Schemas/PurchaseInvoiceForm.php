@@ -25,18 +25,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PurchaseInvoiceForm
 {
-    /**
-     * These should show at the end of form
-     * subtotal
-     * total_amount
-     * base_paid_amount
-     * base_subtotal
-     * base_discount_amount
-     * base_total_amount
-     * discount_amount
-     * paid_amount
-     */
-
     public static function configure(Schema $schema): Schema
     {
         return $schema

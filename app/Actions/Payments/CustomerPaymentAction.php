@@ -5,6 +5,7 @@ namespace App\Actions\Payments;
 use App\Models\Currency;
 use App\Models\Party;
 use App\Models\Payment;
+use App\Models\SaleInvoice;
 use App\Services\Payments\CustomerPaymentService;
 
 class CustomerPaymentAction
@@ -13,20 +14,7 @@ class CustomerPaymentAction
         protected CustomerPaymentService $paymentService,
     ) {}
 
-    public function execute(
-        Party $customer,
-        Currency $currency,
-        float $amount,
-        string $paymentMethod,
-        ?array $allocations = null,
-    ): Payment {
-
-        return $this->paymentService->receive(
-            customer: $customer,
-            currency: $currency,
-            amount: $amount,
-            paymentMethod: $paymentMethod,
-            allocations: $allocations,
-        );
+    public function saleInvoicePayment(SaleInvoice $invoice) : void {
+        $this->paymentService->invoicePayment(invoice: $invoice);
     }
 }

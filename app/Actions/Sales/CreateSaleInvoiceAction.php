@@ -3,7 +3,10 @@
 namespace App\Actions\Sales;
 
 use App\Data\Sales\SaleInvoiceData;
+use App\Enums\SalesInvoiceStatus;
 use App\Models\SaleInvoice;
+use App\Models\StockItem;
+use App\Services\Sales\CogsAllocationService;
 use App\Services\Sales\SaleInvoiceFinancialSummary;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,8 +16,7 @@ final class CreateSaleInvoiceAction
 {
     public function __construct(
         private readonly SaleInvoiceFinancialSummary $financialSummary,
-    ) {
-    }
+    ) {}
 
     public function execute(
         SaleInvoiceData $data
@@ -26,7 +28,6 @@ final class CreateSaleInvoiceAction
              * 1. Calculate each purchase line
              * ---------------------------------------------------------
              */
-            // dd($data->sold_products);
 
             $products = collect($data->sold_products)
                 ->map(function (array $product) {
@@ -66,9 +67,6 @@ final class CreateSaleInvoiceAction
              * ---------------------------------------------------------
              * 3. Generate invoice number
              * ---------------------------------------------------------
-             *
-             * Replace this with your own InvoiceNumberService if
-             * you already have one.
              */
 
             $invoiceSequence = $this->getNextInvoiceSequence();
@@ -77,16 +75,15 @@ final class CreateSaleInvoiceAction
 
             /*
              * ---------------------------------------------------------
-             * 4. Create Purchase Invoice
+             * 4. Create Sale Invoice
              * ---------------------------------------------------------
              */
 
-            $invoice = PurchaseInvoice::query()->create([
+            $invoice = SaleInvoice::query()->create([
                 'party_id' => $data->party_id,
                 'currency_id' => $data->currency_id,
                 'created_by' => Auth::id(),
                 'hawala_office_id' => $data->hawala_office_id ?? null,
-                'original_invoice_number' => $data->original_invoice_number,
                 'system_invoice_number' => $systemInvoiceNumber,
                 'invoice_sequence' => $invoiceSequence,
                 'date' => $data->date,
@@ -99,14 +96,15 @@ final class CreateSaleInvoiceAction
                 'base_subtotal' => $baseAmounts->get('subtotal'),
                 'base_discount_amount' => $baseAmounts->get('discount_amount'),
                 'base_total_amount' => $baseAmounts->get('total_amount'),
+                'net_profit_total' => $summary->get('net_profit_total'),
                 'payment_method' => $data->payment_method,
                 'payment_status' => $summary->get('paymentState'),
-                'status' => PurchaseInvoiceStatus::Draft,
+                'status' => SalesInvoiceStatus::Draft,
             ]);
 
             /*
              * ---------------------------------------------------------
-             * 5. Create Purchase Invoice Lines
+             * 5. Create Sale Invoice Lines
              * ---------------------------------------------------------
              */
             $linesData = $summary->get('lineAmounts');
@@ -115,15 +113,18 @@ final class CreateSaleInvoiceAction
                     $line = $linesData->get($product['product_variant_id']);
                     return [
                         'product_variant_id' => $product['product_variant_id'],
-                        'created_by' => Auth::id(),
                         'currency_id' => $data->currency_id,
                         'exchange_rate' => $exchangeRate,
                         'quantity' => $line['quantity'],
-                        'received_quantity' => 0,
-                        'unit_cost' => $line['unit_cost'],
-                        'total_cost' => $line['total_cost'],
-                        'base_unit_cost' => $line['base_unit_cost'],
-                        'base_total_cost' => $line['base_total_cost'],
+                        'unit_price' => $line['unit_price'],
+                        'discount_amount' => 0,
+                        'line_total' => $line['line_total'],
+                        'base_unit_price' => $line['base_unit_price'],
+                        'base_discount_amount' => 0,
+                        'base_line_total' => $line['base_line_total'],
+                        'cogs_total' => $line['cogs_total'],
+                        'line_net_profit_total' => $line['base_line_total'] - $line['cogs_total'],
+                        'cogs_justification' => $product['cogs_justification'],
                     ];
                 })->all()
             );
@@ -132,12 +133,13 @@ final class CreateSaleInvoiceAction
         });
     }
 
+
     /**
-     * Get the next purchase invoice sequence.
+     * Get the next Sale Invoice sequence.
      */
     private function getNextInvoiceSequence(): int
     {
-        return ((int) PurchaseInvoice::query()->max('invoice_sequence')) + 1;
+        return ((int) SaleInvoice::query()->max('invoice_sequence')) + 1;
     }
 
     /**
@@ -148,12 +150,6 @@ final class CreateSaleInvoiceAction
      */
     private function generateSystemInvoiceNumber(int $sequence): string
     {
-        return 'PI-' . str_pad(
-            (string) $sequence,
-            6,
-            '0',
-            STR_PAD_LEFT
-        ) . Str::random(3);
+        return 'SI-'. now()->format('Y-M-d') . str_pad((string) $sequence, 6, '0', STR_PAD_LEFT);
     }
-
 }

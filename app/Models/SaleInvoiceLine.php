@@ -21,7 +21,7 @@ class SaleInvoiceLine extends Model
             'base_discount_amount' => 'decimal:10',
             'base_line_total' => 'decimal:10',
             'cogs_total' => 'decimal:10',
-            'units_costs' => 'array',
+            'cogs_justification' => 'array',
         ]; 
     }
 
