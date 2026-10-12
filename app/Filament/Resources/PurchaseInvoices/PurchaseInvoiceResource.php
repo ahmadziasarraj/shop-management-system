@@ -21,7 +21,8 @@ class PurchaseInvoiceResource extends Resource
 {
     protected static ?string $model = PurchaseInvoice::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Purchases';
+    protected static string|UnitEnum|null $navigationGroup = 'Sales & Purchases';
+    protected static ?int $navigationSort = 1;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Square3Stack3d;
 
     protected static ?string $recordTitleAttribute = 'PurchaseInvoice';

@@ -20,7 +20,8 @@ use UnitEnum;
 class SaleInvoiceResource extends Resource
 {
     protected static ?string $model = SaleInvoice::class;
-    protected static string|UnitEnum|null $navigationGroup = 'Sales';
+    protected static string|UnitEnum|null $navigationGroup = 'Sales & Purchases';
+    protected static ?int $navigationSort = 2;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::ShoppingCart;
 
     protected static ?string $recordTitleAttribute = 'SaleInvoice';
