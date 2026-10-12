@@ -68,16 +68,17 @@ class PaymentForm
                                 TransactionType::ReceiveFromVendor->value =>
                                 $query->where(fn($q) => $q->where('type', PartyType::Vendor)->orWhere('type', PartyType::VendorCustomer)),
 
-                                TransactionType::EmployeePayment->value =>
-                                $query->where('type', PartyType::Employee),
-
-                                TransactionType::PayOwner->value,
-                                TransactionType::ReceiveFromOwner->value =>
-                                $query->where('type', PartyType::Owner),
-
                                 TransactionType::HawalaReceipt->value,
                                 TransactionType::HawalaPayment->value =>
                                 $query->where('type', PartyType::HawalaOffice),
+                                
+                                // TransactionType::EmployeePayment->value =>
+                                // $query->where('type', PartyType::Employee),
+
+                                // TransactionType::PayOwner->value,
+                                // TransactionType::ReceiveFromOwner->value =>
+                                // $query->where('type', PartyType::Owner),
+
 
                                 default => $query,
                             };
