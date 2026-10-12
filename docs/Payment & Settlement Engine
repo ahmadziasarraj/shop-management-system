@@ -157,13 +157,13 @@ Vendor Payable → DEBIT $50
 Cash/Bank/Hawala → CREDIT $50
 
 
-Party type	Opening balance	Debit	Credit
-Customer	Customer owes you	AR	Opening Equity
-Customer	You owe customer	Opening Equity	AR
-Vendor	You owe vendor	Opening Equity	AP
-Vendor	Vendor owes you	AP	Opening Equity
-Hawala office	Office owes you	Hawala Receivable	Opening Equity
-Hawala office	You owe office	Opening Equity	Hawala Payable
+Party type	 Opening balance	                     Debit	                     Credit
+Customer     Customer owes you	                     AR	                         Opening Equity
+Customer	 You owe customer	                     Opening Equity	             AR
+Vendor	     You owe vendor	                         Opening Equity	             AP
+Vendor	     Vendor owes you	                     AP	                         Opening Equity
+Hawala office	Office owes you	Hawala               Receivable	                 Opening Equity
+Hawala office	You owe office	                     Opening Equity	             Hawala Payable
 
 Customer
     1130 Accounts Receivable

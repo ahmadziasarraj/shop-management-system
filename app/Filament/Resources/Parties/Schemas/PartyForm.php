@@ -74,30 +74,40 @@ class PartyForm
                             ->default(0.0)
                             ->visible(fn(Get $get): bool => $get('type') == PartyType::HawalaOffice)
                             ->columnSpan(2)
-                            // ->belowContent(JsContent::make(
-                            //             <<<'JS'
-                            //         $get('opening_balance') > 0 ? 'bigger than zero' : 'zero'
-                            //         JS
-                            //         ))
                             ->belowContent([
                                 Icon::make(Heroicon::InformationCircle),
                                 Text::make(JsContent::make(
-                                        <<<'JS'
+                                    <<<'JS'
                                     $get('opening_balance') < 0 ? 'ما به صرافی بدهکار هستیم' : 'صرافی به ما بدهکار است.'
                                     JS
-                                    ))
-                            ])
-                            ,
+                                ))
+                            ]),
                         TextInput::make('opening_payable')
                             ->required()
                             ->numeric()
                             ->default(0.0)
-                            ->visible(fn(Get $get): bool => $get('type') == PartyType::Vendor || $get('type') == PartyType::VendorCustomer),
+                            ->visible(fn(Get $get): bool => $get('type') == PartyType::Vendor || $get('type') == PartyType::VendorCustomer)
+                            ->belowContent([
+                                Icon::make(Heroicon::InformationCircle),
+                                Text::make(JsContent::make(
+                                    <<<'JS'
+                                    $get('opening_payable') < 0 ? 'فروشنده به ما بدهکار است.' : 'ما به فروشنده بدهکار هستیم.'
+                                    JS
+                                ))
+                            ]),
                         TextInput::make('opening_receivable')
                             ->required()
                             ->numeric()
                             ->default(0.0)
-                            ->visible(fn(Get $get): bool => $get('type') == PartyType::Customer || $get('type') == PartyType::VendorCustomer),
+                            ->visible(fn(Get $get): bool => $get('type') == PartyType::Customer || $get('type') == PartyType::VendorCustomer)
+                            ->belowContent([
+                                Icon::make(Heroicon::InformationCircle),
+                                Text::make(JsContent::make(
+                                    <<<'JS'
+                                    $get('opening_receivable') < 0 ? 'ما به مشتری بدهکار هستیم.' : 'مشتری به ما بدهکار است.'
+                                    JS
+                                ))
+                            ]),
                         TextInput::make('limit')
                             ->numeric()
                             ->default(0)
