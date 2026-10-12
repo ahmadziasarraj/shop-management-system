@@ -11,14 +11,11 @@ class PaymentInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('id')
-                    ->label('ID'),
                 TextEntry::make('party.name')
                     ->label('Party'),
                 TextEntry::make('currency.name')
                     ->label('Currency'),
-                TextEntry::make('reference_type'),
-                TextEntry::make('reference_id'),
+                
                 TextEntry::make('payment_number'),
                 TextEntry::make('payment_method')
                     ->badge(),
@@ -33,12 +30,6 @@ class PaymentInfolist
                 TextEntry::make('notes')
                     ->placeholder('-')
                     ->columnSpanFull(),
-                TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
             ]);
     }
 }

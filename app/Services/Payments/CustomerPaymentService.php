@@ -30,6 +30,38 @@ class CustomerPaymentService
 
     ) {}
 
+    public function receiveFundFromCustomer(Payment $payment)
+    {
+        return DB::transaction(function () use ($payment) {
+            $settlementAccount = match ($payment->payment_method) {
+                PaymentMethod::Cash   => $this->account('1110'),
+                PaymentMethod::HawalaOffice => $this->account('1120'),
+                PaymentMethod::Bank   => $this->account('1150'),
+                default  => throw new LogicException('Invalid payment method.'),
+            };
+
+            $this->postCustomerPaymentReceiveFund(
+                settlementAccount: $settlementAccount,
+                payment: $payment
+            );
+        });
+    }
+    public function refundToCustomer(Payment $payment) {
+        return DB::transaction(function () use ($payment) {
+            $settlementAccount = match ($payment->payment_method) {
+                PaymentMethod::Cash   => $this->account('1110'),
+                PaymentMethod::HawalaOffice => $this->account('1120'),
+                PaymentMethod::Bank   => $this->account('1150'),
+                default  => throw new LogicException('Invalid payment method.'),
+            };
+
+            $this->postCustomerPaymentRefund(
+                settlementAccount: $settlementAccount,
+                payment: $payment
+            );
+        });
+    }
+
     public function invoicePayment(SaleInvoice $invoice)
     {
 
@@ -60,6 +92,181 @@ class CustomerPaymentService
     private function account(string $code): Account
     {
         return Account::where('code', $code)->firstOrFail();
+    }
+
+    private function postCustomerPaymentRefund(
+        Account $settlementAccount,
+        Payment $payment
+    ): void {
+        $accountsReceivable = $this->account('1130');
+
+        $lines = collect([
+
+            new JournalLineData(
+                account: $accountsReceivable,
+                currency: $payment->currency,
+                debit: abs($payment->amount),
+                credit: 0,
+                exchangeRate: $payment->exchange_rate,
+            ),
+            new JournalLineData(
+                account: $settlementAccount,
+                currency: $payment->currency,
+                debit: 0,
+                credit: abs($payment->amount),
+                exchangeRate: $payment->exchange_rate,
+            ),
+        ]);
+
+        $journalData = new JournalData(
+            journalDate: now()->toDateString(),
+            lines: $lines,
+            description: sprintf(
+                'Customer Refund payment #%s. Payment Narration: %s',
+                $payment->payment_number,
+                $payment->notes
+            ),
+            referenceType: Payment::class,
+            referenceId: (string) $payment->id,
+            createdBy: Auth::id(),
+        );
+
+        $journal = $this->accounting->createJournal($journalData);
+
+        $this->postJournal->execute($journal);
+        $description = sprintf(
+            'Customer Refund Payment. Payment# %s. Payment Narration:%s',
+            $payment->payment_number,
+            $payment->notes
+        );
+
+        // Hawala Office Ledger
+        if ($payment->payment_method == PaymentMethod::HawalaOffice) {
+            $description = sprintf(
+                'Customer Refund Payment through Hawala Office ( %s ). Payment# %s. Payment Narration:%s',
+                $payment->hawalaOffice->name,
+                $payment->payment_number,
+                $payment->notes
+            );
+            $this->ledgerService->record(
+                party: $payment->hawalaOffice,
+                currency: $payment->currency,
+                entryType: PartyLedgerEntryType::HawalaPayment->value,
+                debit: 0,
+                credit: abs($payment->amount),
+                baseDebit: 0,
+                baseCredit: abs($payment->base_amount),
+                exchangeRate: $payment->exchange_rate,
+                description: sprintf(
+                    'Hawala payment to: %s. Payment#%s. Payment Narration: %s',
+                    $payment->party->name,
+                    $payment->payment_number,
+                    $payment->notes
+                ),
+                reference: $payment,
+            );
+        }
+
+        // Customer Ledger
+        $this->ledgerService->record(
+            party: $payment->party,
+            currency: $payment->currency,
+            entryType: PartyLedgerEntryType::CustomerPayment->value,
+            debit: abs($payment->amount),
+            credit: 0,
+            baseDebit: abs($payment->base_amount),
+            baseCredit: 0,
+            exchangeRate: $payment->exchange_rate,
+            description: $description,
+            reference: $payment,
+        );
+    }
+
+    private function postCustomerPaymentReceiveFund(
+        Account $settlementAccount,
+        Payment $payment
+    ): void {
+        $accountsReceivable = $this->account('1130');
+
+        $lines = collect([
+
+            new JournalLineData(
+                account: $settlementAccount,
+                currency: $payment->currency,
+                debit: abs($payment->amount),
+                credit: 0,
+                exchangeRate: $payment->exchange_rate,
+            ),
+            new JournalLineData(
+                account: $accountsReceivable,
+                currency: $payment->currency,
+                debit: 0,
+                credit: abs($payment->amount),
+                exchangeRate: $payment->exchange_rate,
+            ),
+        ]);
+
+        $journalData = new JournalData(
+            journalDate: now()->toDateString(),
+            lines: $lines,
+            description: sprintf(
+                'Customer payment #%s.',
+                $payment->payment_number
+            ),
+            referenceType: Payment::class,
+            referenceId: (string) $payment->id,
+            createdBy: Auth::id(),
+        );
+
+        $journal = $this->accounting->createJournal($journalData);
+
+        $this->postJournal->execute($journal);
+        $description = sprintf(
+            'Customer Payment recevied. Payment# %s. Payment Narration: %s',
+            $payment->payment_number,
+            $payment->notes
+        );
+
+        // Hawala Office Ledger
+        if ($payment->payment_method == PaymentMethod::HawalaOffice) {
+            $description = sprintf(
+                'Customer Payment recevied via Hawala Office ( %s ). Payment# %s. Payment Narration: %s',
+                $payment->hawalaOffice->name,
+                $payment->payment_number,
+                $payment->notes
+            );
+            $this->ledgerService->record(
+                party: $payment->hawalaOffice,
+                currency: $payment->currency,
+                entryType: PartyLedgerEntryType::HawalaPayment->value,
+                debit: abs($payment->amount),
+                credit: 0,
+                baseDebit: abs($payment->base_amount),
+                baseCredit: 0,
+                exchangeRate: $payment->exchange_rate,
+                description: sprintf(
+                    'Hawala payment received from: %s. Payment#%s. Payment Narration: %s',
+                    $payment->party->name,
+                    $payment->payment_number,
+                    $payment->notes
+                ),
+                reference: $payment,
+            );
+        }
+
+        // Customer Ledger
+        $this->ledgerService->record(
+            party: $payment->party,
+            currency: $payment->currency,
+            entryType: PartyLedgerEntryType::CustomerPayment->value,
+            debit: 0,
+            credit: abs($payment->amount),
+            baseDebit: 0,
+            baseCredit: abs($payment->base_amount),
+            exchangeRate: $payment->exchange_rate,
+            description: $description,
+            reference: $payment,
+        );
     }
 
     private function postInvoicePayment(

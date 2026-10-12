@@ -41,6 +41,10 @@ class ExchangeRateForm
                     ->columns(3),
                 DatePicker::make('effective_at')
                     ->required()
+                    ->native(false)
+                    ->firstDayOfWeek(7)
+                    ->closeOnDateSelection()
+                    ->default(now())
             ]);
     }
 }

@@ -24,22 +24,14 @@ return new class extends Migration
 
             $table->string('reference_type');
             $table->ulid('reference_id');
-
             $table->string('payment_number');
-
             $table->string('payment_method');
-
             $table->decimal('amount', 20, 10);
             $table->decimal('base_amount', 20, 10)->default(0);
             $table->decimal('exchange_rate', 20, 10)->default(0);
-
             $table->date('payment_date');
-
-
             $table->text('notes')->nullable();
-
             $table->timestamps();
-
             $table->index([
                 'party_id',
                 'payment_date',

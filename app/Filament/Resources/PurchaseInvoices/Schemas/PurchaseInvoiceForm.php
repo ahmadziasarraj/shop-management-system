@@ -85,6 +85,7 @@ class PurchaseInvoiceForm
                             ->required()
                             ->native(false)
                             ->firstDayOfWeek(7)
+                            ->default(now())
                             ->label('Purchase Date'),
                         Hidden::make('discount_amount')
                             ->default(0.0)

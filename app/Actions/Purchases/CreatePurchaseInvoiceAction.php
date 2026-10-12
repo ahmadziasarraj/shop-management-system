@@ -149,6 +149,6 @@ final class CreatePurchaseInvoiceAction
      */
     private function generateSystemInvoiceNumber(int $sequence): string
     {
-        return 'PI-' . now()->format('Y-M-d') . str_pad((string) $sequence, 6, '0', STR_PAD_LEFT);
+        return 'PI-' . now()->format('YMd') . str_pad((string) $sequence, 6, '0', STR_PAD_LEFT);
     }
 }

@@ -8,4 +8,6 @@ enum PartyType: string
     case Customer = 'customer';
     case VendorCustomer = 'vendor\customer';
     case HawalaOffice = 'hawala_office';
+    // case Employee = 'employee';
+    // case Owner = 'owner';
 }

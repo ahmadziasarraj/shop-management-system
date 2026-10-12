@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PaymentMethod;
+use App\Enums\TransactionType;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,7 @@ class Payment extends Model
 
     protected $casts = [
         'payment_method' => PaymentMethod::class,
+        'transaction_type' => TransactionType::class,
         'payment_date' => 'date',
 
         'amount' => 'decimal:10',
@@ -24,6 +26,10 @@ class Payment extends Model
     public function party(): BelongsTo
     {
         return $this->belongsTo(Party::class);
+    }
+    public function hawalaOffice(): BelongsTo
+    {
+        return $this->belongsTo(Party::class, 'hawala_office_id');
     }
 
     public function currency(): BelongsTo

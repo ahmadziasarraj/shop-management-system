@@ -68,14 +68,6 @@ final class SaleInvoiceFinancialSummary
          * ---------------------------------------------------------
          * 4. Exchange rate
          * ---------------------------------------------------------
-         *
-         * Example:
-         *
-         * Base: USD
-         * Invoice: AFN
-         * Rate: 70
-         *
-         * 700 AFN = 10 USD
          */
 
         $rate = $this->exchangeRateService->getRate(
